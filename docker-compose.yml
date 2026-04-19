@@ -1,8 +1,7 @@
-version: '3.8'
-
 services:
-  web:
+  docklab-web:
     build: .
+    image: docklab-web:latest
     container_name: docklab-web
     restart: unless-stopped
     ports:

@@ -1,4 +1,6 @@
 FROM node:20-alpine AS base
+# Prisma requires openssl
+RUN apk add --no-cache openssl
 
 # Install dependencies only when needed
 FROM base AS deps

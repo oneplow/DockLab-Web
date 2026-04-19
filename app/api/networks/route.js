@@ -26,6 +26,7 @@ export async function POST(request) {
     try {
         const body = await request.json()
         const { action, name, id } = body
+        console.log('[networks] POST action:', action, 'name:', name, 'id:', id)
 
         if (action === 'create') {
             await createNetwork(name)
@@ -35,6 +36,7 @@ export async function POST(request) {
 
         return Response.json({ success: true })
     } catch (err) {
+        console.error('[networks] POST error:', err)
         return Response.json({ error: err.message }, { status: 500 })
     }
 }

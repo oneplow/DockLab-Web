@@ -116,8 +116,17 @@ export async function POST(request) {
                 if (name) containerOpts.name = name
                 if (Cmd) containerOpts.Cmd = Cmd
 
-                const container = await docker.createContainer(containerOpts)
-                await container.start()
+                let container = null
+                try {
+                    container = await docker.createContainer(containerOpts)
+                    await container.start()
+                } catch (err) {
+                    if (container) {
+                        try { await container.remove({ force: true }) } catch (e) {}
+                    }
+                    throw err
+                }
+                
                 await logAudit(session, 'container.create', name || container.id, `Image: ${image}`)
 
                 // Auto-grant access if developer created it so they don't lose visibility

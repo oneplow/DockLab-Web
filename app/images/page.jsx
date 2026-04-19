@@ -94,7 +94,6 @@ export default function ImagesPage() {
 
     const handlePullFromHub = async (imageName) => {
         setPullingHub(imageName)
-        const tid = toast.loading(`Pulling ${imageName}...`, { description: 'Downloading from Docker Hub' })
         try {
             const res = await fetch('/api/images', {
                 method: 'POST',
@@ -103,13 +102,12 @@ export default function ImagesPage() {
             })
             const data = await res.json()
             if (data.error) {
-                toast.update(tid, { type: 'error', message: data.error })
+                toast.error(data.error)
             } else {
-                toast.update(tid, { type: 'success', message: `${imageName} pulled successfully` })
                 fetchImages()
             }
         } catch (e) {
-            toast.update(tid, { type: 'error', message: e.message })
+            toast.error(e.message)
         }
         setPullingHub(null)
     }
@@ -117,7 +115,6 @@ export default function ImagesPage() {
     const handlePull = async () => {
         if (!pullImage.trim()) return toast.error('Image name is required')
         setPulling(true)
-        const tid = toast.loading(`Pulling ${pullImage}...`, { description: 'Downloading layers from Docker Hub' })
         try {
             const res = await fetch('/api/images', {
                 method: 'POST',
@@ -126,15 +123,14 @@ export default function ImagesPage() {
             })
             const data = await res.json()
             if (data.error) {
-                toast.update(tid, { type: 'error', message: data.error })
+                toast.error(data.error)
             } else {
-                toast.update(tid, { type: 'success', message: `${pullImage} pulled successfully` })
                 setShowPull(false)
                 setPullImage('')
                 fetchImages()
             }
         } catch (e) {
-            toast.update(tid, { type: 'error', message: e.message })
+            toast.error(e.message)
         }
         setPulling(false)
     }

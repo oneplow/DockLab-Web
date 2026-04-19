@@ -2,19 +2,43 @@
 
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
-import { Container, Chrome } from 'lucide-react'
+import { Container, Key } from 'lucide-react'
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false)
+    const [passkey, setPasskey] = useState('')
+    const [error, setError] = useState('')
 
     const handleGoogleLogin = async () => {
         setLoading(true)
+        setError('')
         await signIn('google', { callbackUrl: '/' })
     }
 
+    const handlePasskeyLogin = async (e) => {
+        e.preventDefault()
+        if (!passkey.trim()) return
+
+        setLoading(true)
+        setError('')
+        
+        const res = await signIn('credentials', { 
+            passkey, 
+            redirect: false,
+            callbackUrl: '/'
+        })
+
+        if (res?.error) {
+            setError('Invalid passkey')
+            setLoading(false)
+        } else if (res?.url) {
+            window.location.href = res.url
+        }
+    }
+
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-            <div className="relative z-10 w-full max-w-sm animate-fade-in">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
+            <div className="relative z-10 w-full max-w-sm animate-fade-in px-4">
                 {/* Logo */}
                 <div className="text-center mb-8 animate-slide-up">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-500/20 mb-4 shadow-sm">
@@ -25,18 +49,18 @@ export default function LoginPage() {
                 </div>
 
                 {/* Card */}
-                <div className="bg-card dark:bg-[#18181b]/80 backdrop-blur border border-border dark:border-white/8 rounded-2xl p-8 shadow-xl animate-scale-in">
+                <div className="bg-card dark:bg-[#18181b]/80 backdrop-blur border border-border dark:border-white/8 rounded-2xl p-6 sm:p-8 shadow-xl animate-scale-in">
                     <div className="mb-6">
                         <h2 className="text-lg font-semibold text-foreground">Sign in</h2>
-                        <p className="text-sm text-muted-foreground mt-1">Connect with your Google account to continue</p>
+                        <p className="text-sm text-muted-foreground mt-1">Choose your preferred login method</p>
                     </div>
 
                     <button
                         onClick={handleGoogleLogin}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white text-gray-800 font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-100 border border-gray-200 dark:border-transparent transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                        className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white text-gray-800 font-medium text-sm hover:bg-gray-50 border border-gray-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm mb-6"
                     >
-                        {loading ? (
+                        {loading && !passkey ? (
                             <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
                         ) : (
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -46,8 +70,41 @@ export default function LoginPage() {
                                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                             </svg>
                         )}
-                        {loading ? 'Signing in...' : 'Continue with Google'}
+                        Continue with Google
                     </button>
+
+                    <div className="relative mb-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs text-muted-foreground uppercase tracking-widest">
+                            <span className="bg-card px-2">Or</span>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handlePasskeyLogin} className="space-y-4">
+                        <div>
+                            <div className="relative">
+                                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <input
+                                    type="password"
+                                    placeholder="Enter secure passkey"
+                                    value={passkey}
+                                    onChange={(e) => setPasskey(e.target.value)}
+                                    className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-muted-foreground"
+                                    required
+                                />
+                            </div>
+                            {error && <p className="text-xs text-red-400 mt-2 ml-1">{error}</p>}
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={loading || !passkey.trim()}
+                            className="w-full flex items-center justify-center py-2.5 rounded-xl bg-foreground text-background font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loading && passkey ? 'Verifying...' : 'Sign in with Passkey'}
+                        </button>
+                    </form>
 
                     <div className="mt-6 pt-6 border-t border-border dark:border-white/5">
                         <p className="text-xs text-center text-muted-foreground">
@@ -56,7 +113,7 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <p className="text-center text-xs text-muted-foreground mt-6">
+                <p className="text-center text-[11px] text-muted-foreground mt-6 font-medium tracking-wide">
                     © 2025 Docklab · Self-hosted Docker Platform
                 </p>
             </div>

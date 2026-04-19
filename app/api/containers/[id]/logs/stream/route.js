@@ -3,6 +3,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
 import { cookies } from 'next/headers'
 import { getDockerClient } from '@/lib/docker/service'
+import { decrypt } from '@/lib/crypto'
 
 export const dynamic = 'force-dynamic'
 
@@ -84,7 +85,7 @@ export async function GET(req, { params }) {
                     const url = `${docklabServerUrl}/api/containers/${id}/logs/stream?tail=${tail}`
 
                     const response = await fetch(url, {
-                        headers: { 'Authorization': `Bearer ${activeHost.apiKey || ''}` },
+                        headers: { 'Authorization': `Bearer ${activeHost.apiKey ? decrypt(activeHost.apiKey) : ''}` },
                         signal: abortController.signal
                     })
 

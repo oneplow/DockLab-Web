@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/prisma'
 
@@ -12,6 +13,19 @@ export const authOptions = {
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             checks: ['pkce', 'none'], // Downgrade state check for LAN testing ease
         }),
+        CredentialsProvider({
+            name: 'Passkey',
+            credentials: {
+                passkey: { label: "Passkey", type: "password" }
+            },
+            async authorize(credentials) {
+                const adminPasskey = process.env.ADMIN_PASSKEY
+                if (adminPasskey && credentials.passkey === adminPasskey) {
+                    return { id: 'admin-passkey', name: 'Administrator', role: 'admin', email: 'admin@docklab.local' }
+                }
+                return null
+            }
+        })
     ],
     pages: {
         signIn: '/login',
@@ -38,7 +52,7 @@ export const authOptions = {
                 token.role = adminEmails.includes(token.email) ? 'admin' : 'developer'
             }
             // Continuous session verification - check DB for latest role
-            if (token.email) {
+            if (token.email && token.email !== 'admin@docklab.local') {
                 try {
                     const dbUser = await prisma.user.findUnique({ where: { email: token.email } })
                     if (dbUser) {

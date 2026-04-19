@@ -1,0 +1,134 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("viewer") // admin, developer, viewer
+  accounts      Account[]
+  sessions      Session[]
+  dockerHosts   DockerHost[]
+  containerAccess ContainerAccess[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ServerSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model DockerHost {
+  id             String   @id @default(cuid())
+  name           String   // E.g., "Production Server", "Staging Server"
+  socketPath     String   // E.g., "tcp://192.168.1.10:2375" or "https://1.2.3.4:9117"
+  isLocal        Boolean  @default(false)
+  connectionType String   @default("tcp") // "tcp" or "docklab-server"
+  apiKey         String?  @db.Text        // Encrypted API key for docklab-server connections
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Who added this host
+  addedById  String?
+  addedBy    User?    @relation(fields: [addedById], references: [id], onDelete: SetNull)
+  containerAccess ContainerAccess[]
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  userName     String?
+  userImage    String?
+  dockerHostId String?  // Optional relation to the host affected
+  action       String   // e.g. "container.start", "image.pull", "stack.remove"
+  target       String?  // e.g. container name, image name
+  details      String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+}
+
+model ContainerAccess {
+  id           String @id @default(cuid())
+  userId       String
+  dockerHostId String
+  containerId  String // Detailed hex or name identifier for the container
+  
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dockerHost   DockerHost @relation(fields: [dockerHostId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dockerHostId, containerId])
+  @@index([userId])
+}
+
+model WebhookSetting {
+  id        String   @id @default(cuid())
+  name      String   // E.g. "Production Discord Alert"
+  provider  String   // "discord", "slack", "line"
+  url       String   @db.Text
+  events    String   // comma separated list of events: "crash,ram_spike,start,stop"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Operation {
+  id            String   @id @default(cuid())
+  type          String   // "pull_image", "create_container", "deploy_stack", etc.
+  status        String   @default("running") // "running", "success", "error", "cancelled"
+  message       String   // Human readable: "Pulling ubuntu/apache2..."
+  description   String?  // Sub-text: "Downloading from Docker Hub"
+  progress      Int      @default(0) // 0-100
+  error         String?  @db.Text
+  userId        String?
+  dockerHostId  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([status])
+}
+

@@ -48,7 +48,7 @@
 - **UI Architecture**: Tailwind CSS 4, Radix UI Primitives, Lucide Icons
 - **Real-time Core**: WebSockets, Server-Sent Events (SSE)
 - **Terminal Engine**: [Xterm.js](https://xtermjs.org/)
-- **Security**: [NextAuth.js](https://next-auth.js.org/), Docklabet, Express-Rate-Limit
+- **Security**: [NextAuth.js](https://next-auth.js.org/), Helmet, Express-Rate-Limit
 
 ---
 

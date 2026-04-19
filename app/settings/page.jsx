@@ -737,7 +737,7 @@ export default function SettingsPage() {
                             <label className="block text-xs font-medium text-muted-foreground mb-1.5">API Key</label>
                             <input
                                 type="password"
-                                placeholder="hd_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                                placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                 value={newHostForm.apiKey}
                                 onChange={(e) => { setNewHostForm({ ...newHostForm, apiKey: e.target.value }); setTestResult(null) }}
                                 className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-sm font-mono text-foreground focus:outline-none focus:border-blue-500/50 transition-colors"

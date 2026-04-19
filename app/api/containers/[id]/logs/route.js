@@ -96,7 +96,7 @@ export async function GET(request, { params }) {
         // Hide sensitive info for viewer role
         if (session.user?.role === 'viewer') {
             processedLogs = cleanLogs.map(line => {
-                // Catch standard formats: api_key=123, secret:"456", API Key: hd_
+                // Catch standard formats: api_key=123, secret:"456", API Key:
                 return line.replace(/(api_key|apikey|api-key|secret|password|token|bearer|auth|api key)(["']?\s*[:=]\s*["']?)([a-zA-Z0-9_\-]{8,})/gi, '$1$2********')
             })
         }

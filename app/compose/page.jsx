@@ -125,12 +125,12 @@ export default function ComposePage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-5 animate-fade-in">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h1 className="text-xl font-bold text-foreground">Docker Compose</h1>
                     <p className="text-sm text-muted-foreground mt-0.5">Deploy multi-container applications</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 self-start sm:self-auto">
                     {status === 'running' ? (
                         <button onClick={() => setConfirmStop(true)} className="flex items-center gap-2 px-3.5 py-2 bg-red-600/80 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors">
                             <Square className="w-4 h-4" /> Stop Stack
@@ -156,8 +156,8 @@ export default function ComposePage() {
             )}
 
             {/* Tabs & Stack Name Input */}
-            <div className="flex items-center justify-between bg-card p-3 border border-border rounded-xl">
-                <div className="flex gap-1 p-1 bg-muted rounded-lg border border-border">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card p-3 border border-border rounded-xl">
+                <div className="flex gap-1 p-1 bg-muted rounded-lg border border-border flex-shrink-0">
                     {['editor', 'logs'].map(t => (
                         <button
                             key={t}
@@ -168,14 +168,14 @@ export default function ComposePage() {
                         </button>
                     ))}
                 </div>
-                <div className="flex items-center gap-3">
-                    <label className="text-sm font-medium text-foreground">Project Name:</label>
+                <div className="flex items-center gap-3 min-w-0">
+                    <label className="text-sm font-medium text-foreground flex-shrink-0">Project Name:</label>
                     <input
                         type="text"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
                         placeholder="e.g. my-app"
-                        className="bg-muted border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 font-mono text-muted-foreground"
+                        className="bg-muted border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-48 font-mono text-muted-foreground min-w-0"
                     />
                 </div>
             </div>

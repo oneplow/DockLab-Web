@@ -90,38 +90,37 @@ export default function VolumesPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-5 animate-fade-in">
-            <div className="flex items-center justify-between">
-                <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="min-w-0">
                     <h1 className="text-xl font-bold text-foreground">Volumes</h1>
                     <p className="text-sm text-muted-foreground mt-0.5">Persistent storage for your containers</p>
                     {apiError && <p className="text-xs text-red-400 mt-1">Error: {apiError}. Is Docker running?</p>}
                 </div>
-                <button onClick={() => setShow(true)} className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors">
+                <button onClick={() => setShow(true)} className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors self-start sm:self-auto flex-shrink-0">
                     <Plus className="w-4 h-4" /> Create Volume
                 </button>
             </div>
 
             <div className="grid gap-3">
                 {volumes.map(v => (
-                    <div key={v.name} className="bg-card border border-border rounded-xl p-4 hover:border-foreground/20 transition-colors flex items-center gap-4">
-                        <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/15 flex items-center justify-center flex-shrink-0">
+                    <div key={v.name} className="bg-card border border-border rounded-xl p-4 hover:border-foreground/20 transition-colors flex items-center gap-3 sm:gap-4 overflow-hidden">
+                        <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/15 flex items-center justify-center flex-shrink-0 hidden sm:flex">
                             <HardDrive className="w-4 h-4 text-violet-400" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <Link href={`/volumes/${v.name}`} className="text-sm font-semibold text-foreground hover:text-blue-500 hover:underline transition-colors flex items-center gap-2 group">
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                            <Link href={`/volumes/${v.name}`} className="block text-sm font-semibold text-foreground hover:text-blue-500 hover:underline transition-colors truncate">
                                 {v.name}
-                                <ChevronRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </Link>
-                            <div className="flex items-center gap-3 mt-1">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
                                 <span className="text-xs text-muted-foreground">Driver: <span className="text-foreground">{v.driver}</span></span>
                                 <span className="text-xs text-muted-foreground">Size: <span className="text-foreground">{v.size}</span></span>
                                 <span className="text-xs text-muted-foreground">Created: <span className="text-foreground">{v.created}</span></span>
                             </div>
                             {v.containers?.length > 0 && (
-                                <div className="flex items-center gap-1.5 mt-2">
-                                    <LinkIcon className="w-3 h-3 text-muted-foreground" />
+                                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                                    <LinkIcon className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                                     {v.containers.map(c => (
-                                        <span key={c} className="px-1.5 py-0.5 bg-muted text-muted-foreground text-xs rounded font-mono">{c}</span>
+                                        <span key={c} className="px-1.5 py-0.5 bg-muted text-muted-foreground text-xs rounded font-mono truncate max-w-[150px]">{c}</span>
                                     ))}
                                 </div>
                             )}
@@ -129,7 +128,7 @@ export default function VolumesPage() {
                         <button
                             onClick={() => setDeleteModal({ open: true, name: v.name })}
                             disabled={!!actionLoading}
-                            className="p-2 text-muted-foreground hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                            className="p-2 text-muted-foreground hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors flex-shrink-0"
                         >
                             {actionLoading === 'remove-' + v.name ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                         </button>

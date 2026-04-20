@@ -109,20 +109,20 @@ export default function StacksPage() {
                         return (
                             <div key={stack.name} className="bg-card border border-border rounded-xl overflow-hidden">
                                 {/* Stack Header */}
-                                <div className="px-5 py-4 flex items-center justify-between">
-                                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => toggleExpand(stack.name)}>
-                                        {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
-                                        <Layers className="w-5 h-5 text-purple-400" />
-                                        <div>
-                                            <h3 className="text-sm font-bold text-foreground">{stack.name}</h3>
+                                <div className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3 cursor-pointer min-w-0" onClick={() => toggleExpand(stack.name)}>
+                                        {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
+                                        <Layers className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                                        <div className="min-w-0">
+                                            <h3 className="text-sm font-bold text-foreground truncate">{stack.name}</h3>
                                             <p className="text-xs text-muted-foreground">{stack.totalCount} container{stack.totalCount !== 1 ? 's' : ''} · {stack.services.length} service{stack.services.length !== 1 ? 's' : ''}</p>
                                         </div>
-                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${statusColor(stack.status)}`}>
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border flex-shrink-0 ${statusColor(stack.status)}`}>
                                             {statusLabel(stack.status)}
                                         </span>
                                     </div>
                                     {!isViewer && (
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
                                             {stack.status !== 'running' && (
                                                 <button
                                                     onClick={() => handleStackAction(stack.name, 'start')}
@@ -166,39 +166,65 @@ export default function StacksPage() {
                                 {/* Expanded Container List */}
                                 {isExpanded && (
                                     <div className="border-t border-border">
-                                        <table className="w-full text-xs">
-                                            <thead className="bg-muted/50">
-                                                <tr className="text-left text-muted-foreground">
-                                                    <th className="px-5 py-2 font-medium">Container</th>
-                                                    <th className="px-5 py-2 font-medium">Service</th>
-                                                    <th className="px-5 py-2 font-medium">Image</th>
-                                                    <th className="px-5 py-2 font-medium w-24">State</th>
-                                                    <th className="px-5 py-2 font-medium">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {stack.containers.map(c => (
-                                                    <tr key={c.id} className="border-t border-border/30 hover:bg-muted/20 transition-colors cursor-pointer"
-                                                        onClick={() => window.location.href = `/containers/${c.id}`}
-                                                    >
-                                                        <td className="px-5 py-2.5">
-                                                            <div className="flex items-center gap-2">
-                                                                <Box className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-                                                                <span className="font-mono font-medium text-foreground">{c.name}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-5 py-2.5 text-muted-foreground font-mono">{c.service}</td>
-                                                        <td className="px-5 py-2.5 text-muted-foreground font-mono truncate max-w-[200px]">{c.image}</td>
-                                                        <td className="px-5 py-2.5">
-                                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${c.state === 'running' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-                                                                {c.state}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-5 py-2.5 text-muted-foreground">{c.status}</td>
+                                        {/* Desktop table view */}
+                                        <div className="hidden sm:block">
+                                            <table className="w-full text-xs">
+                                                <thead className="bg-muted/50">
+                                                    <tr className="text-left text-muted-foreground">
+                                                        <th className="px-5 py-2 font-medium">Container</th>
+                                                        <th className="px-5 py-2 font-medium">Service</th>
+                                                        <th className="px-5 py-2 font-medium">Image</th>
+                                                        <th className="px-5 py-2 font-medium w-24">State</th>
+                                                        <th className="px-5 py-2 font-medium">Status</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    {stack.containers.map(c => (
+                                                        <tr key={c.id} className="border-t border-border/30 hover:bg-muted/20 transition-colors cursor-pointer"
+                                                            onClick={() => window.location.href = `/containers/${c.id}`}
+                                                        >
+                                                            <td className="px-5 py-2.5">
+                                                                <div className="flex items-center gap-2">
+                                                                    <Box className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                                                                    <span className="font-mono font-medium text-foreground">{c.name}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-5 py-2.5 text-muted-foreground font-mono">{c.service}</td>
+                                                            <td className="px-5 py-2.5 text-muted-foreground font-mono truncate max-w-[200px]">{c.image}</td>
+                                                            <td className="px-5 py-2.5">
+                                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${c.state === 'running' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                                                                    {c.state}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-5 py-2.5 text-muted-foreground">{c.status}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        {/* Mobile card view */}
+                                        <div className="sm:hidden divide-y divide-border/30">
+                                            {stack.containers.map(c => (
+                                                <div key={c.id} className="p-4 hover:bg-muted/20 transition-colors cursor-pointer active:bg-muted/30"
+                                                    onClick={() => window.location.href = `/containers/${c.id}`}
+                                                >
+                                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <Box className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                                                            <span className="font-mono font-medium text-foreground text-xs truncate">{c.name}</span>
+                                                        </div>
+                                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase flex-shrink-0 ${c.state === 'running' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                                                            {c.state}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                                                        <span>Service: <span className="text-foreground font-mono">{c.service}</span></span>
+                                                        <span className="truncate">Image: <span className="text-foreground font-mono">{c.image}</span></span>
+                                                    </div>
+                                                    {c.status && <p className="text-xs text-muted-foreground mt-1">{c.status}</p>}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </div>
